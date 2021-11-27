@@ -66,6 +66,7 @@ return {
 
 		self.newbutton = Button(Theme, "New", "8111953872", function()
 			TimelineUI:Open()
+			self:Close()
 		end)
 		self.openbutton = Button(Theme, "Open", "8111953872", function()
 			
