@@ -1,0 +1,12 @@
+{
+  "name": "FX-Blue-Plugin",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "FX-Blue": {
+        "$path": "src/Plugin"
+      }
+    }
+  }
+}
