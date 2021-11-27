@@ -1,7 +1,7 @@
 local TweenService = game:GetService("TweenService")
 
 local Toggled = script.Parent.Toggled
-local NewFileUI = require(script.Parent.NewFile)
+local TimelineUI = require(script.Parent.Timeline)
 local Theme = require(script.Parent.Theme)
 
 local Elements = script.Parent.Elements
@@ -64,8 +64,12 @@ return {
 		self.filestitle.TextXAlignment = Enum.TextXAlignment.Left
 		self.filestitle.Parent = self.files
 
-		self.newbutton = Button(Theme, "New", "8111953872")
-		self.openbutton = Button(Theme, "Open", "8111953872")
+		self.newbutton = Button(Theme, "New", "8111953872", function()
+			TimelineUI:Open()
+		end)
+		self.openbutton = Button(Theme, "Open", "8111953872", function()
+			
+		end)
 
 		self.newbutton.Parent = self.files
 		self.openbutton.Parent = self.files

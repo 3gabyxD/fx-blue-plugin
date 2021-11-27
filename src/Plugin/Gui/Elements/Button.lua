@@ -1,4 +1,4 @@
-return function(theme, title, icon)
+return function(theme, title, icon, callback)
 	local f = Instance.new("Frame")
 	f.BackgroundTransparency = 1
 	f.Size = UDim2.new(.8, 0, 0, theme.TextSize)
@@ -22,6 +22,8 @@ return function(theme, title, icon)
 	b.TextTransparency = theme.ForegroundTransparency
 	b.TextXAlignment = Enum.TextXAlignment.Left
 	b.Parent = f
+
+	b.MouseButton1Click:Connect(callback)
 
 	return f
 end

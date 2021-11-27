@@ -18,14 +18,15 @@ ScreenButton.ImageTransparency = 1
 ScreenButton.BackgroundTransparency = 1
 ScreenButton.Size = UDim2.fromScale(1, 1)
 ScreenButton.Visible = false
+ScreenButton.ZIndex = -50
 ScreenButton.Parent = MainScreen
 
 local Gui = script.Parent:WaitForChild("Gui")
 local Toggled = Gui.Toggled
 local Overlay = require(Gui.Overlay)
-local NewFile = require(Gui.NewFile)
+local Timeline = require(Gui.Timeline)
 
-NewFile:Init(MainScreen)
+Timeline:Init(MainScreen)
 Overlay:Init(MainScreen)
 
 MainButton.Click:Connect(function()
