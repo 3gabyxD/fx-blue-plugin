@@ -1,12 +1,12 @@
 local TweenService = game:GetService("TweenService")
-local Transparency = require(script.Parent.Transparency)
 
-local Toggled = require(script.Parent.Toggled)
+local Toggled = script.Parent.Toggled
 local NewFileUI = require(script.Parent.NewFile)
 local Theme = require(script.Parent.Theme)
 
 local Elements = script.Parent.Elements
 local Button = require(Elements.Button)
+local Transparency = require(Elements.Transparency)
 
 return {
 	Active = false,
@@ -89,7 +89,6 @@ return {
 	end,
 
 	Close = function(self)
-		if self.Active then return end
 		Transparency:fade(self.frame, .5, 0, 1)
 		TweenService:Create(
 			self.frame,
