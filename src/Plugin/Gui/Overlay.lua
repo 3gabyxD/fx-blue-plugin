@@ -1,0 +1,115 @@
+local TweenService = game:GetService("TweenService")
+local Transparency = require(script.Parent.Transparency)
+
+local Toggled = require(script.Parent.Toggled)
+local NewFileUI = require(script.Parent.NewFile)
+local Theme = require(script.Parent.Theme)
+
+local Elements = script.Parent.Elements
+local Button = require(Elements.Button)
+
+return {
+	Active = false,
+
+	Init = function(self, screen)
+		self.frame = Instance.new("Frame")
+		self.frame.Size = UDim2.fromOffset(400, 350)
+		self.frame.Visible = false
+		self.frame.ZIndex = 50
+		self.frame.AnchorPoint = Vector2.new(.5, .5)
+		self.frame.Position = UDim2.fromScale(.5, .5)
+
+		self.frame.BackgroundTransparency = Theme.BackgroundTransparency
+		self.frame.BackgroundColor3 = Theme.Background
+		self.frame.BorderSizePixel = 0
+
+		self.uicorner = Instance.new("UICorner")
+		self.uicorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
+		self.uicorner.Parent = self.frame
+
+		self.thumbnail = Instance.new("ImageLabel")
+		self.thumbnail.Size = UDim2.fromScale(1, .4)
+
+		self.thumbnail.Image = "rbxassetid://" .. Theme.OverlayThumbnail
+		self.thumbnail.ImageTransparency = Theme.OverlayThumbnailTransparency
+		self.thumbnail.ScaleType = Enum.ScaleType[Theme.OverlayThumbnailScale]
+		self.thumbnail.BackgroundTransparency = 1
+		self.thumbnail.BorderSizePixel = 0
+
+		self.tuicorner = Instance.new("UICorner")
+		self.tuicorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
+		self.tuicorner.Parent = self.thumbnail
+
+		self.thumbnail.Parent = self.frame
+
+		self.files = Instance.new("Frame")
+		self.files.AnchorPoint = Vector2.new(0, 1)
+		self.files.Size = UDim2.new(.5, -Theme.OverlayPaddingSize, .6, -Theme.OverlayPaddingSize)
+		self.files.Position = UDim2.new(0, Theme.OverlayPaddingSize, 1, 0)
+		self.files.BackgroundTransparency = 1
+
+		self.fileslist = Instance.new("UIListLayout")
+		self.fileslist.SortOrder = Enum.SortOrder.LayoutOrder
+		self.fileslist.Padding = UDim.new(0, 5)
+		self.fileslist.Parent = self.files
+
+		self.filestitle = Instance.new("TextLabel")
+		self.filestitle.Size = UDim2.new(.8, 0, 0, Theme.TextSize)
+		self.filestitle.Font = Enum.Font[Theme.Font]
+		self.filestitle.BackgroundTransparency = 1
+		self.filestitle.Text = "File"
+		self.filestitle.TextSize = Theme.TextSize
+		self.filestitle.TextColor3 = Theme.Foreground
+		self.filestitle.TextTransparency = Theme.ForegroundTransparency
+		self.filestitle.TextXAlignment = Enum.TextXAlignment.Left
+		self.filestitle.Parent = self.files
+
+		self.newbutton = Button(Theme, "New", "8111953872")
+		self.openbutton = Button(Theme, "Open", "8111953872")
+
+		self.newbutton.Parent = self.files
+		self.openbutton.Parent = self.files
+
+		self.files.Parent = self.frame
+		self.frame.Parent = screen
+
+		self:Update()
+		Transparency:cacheall(self.frame)
+	end,
+
+	Open = function(self)
+		self.frame.Size = UDim2.fromOffset(400-50, 350-50)
+		self.frame.Visible = true
+		TweenService:Create(
+			self.frame,
+			TweenInfo.new(.5),
+			{Size = UDim2.fromOffset(400, 350)}
+		):Play()
+		Transparency:fade(self.frame, .5, 1, 0)
+	end,
+
+	Close = function(self)
+		if self.Active then return end
+		Transparency:fade(self.frame, .5, 0, 1)
+		TweenService:Create(
+			self.frame,
+			TweenInfo.new(.5),
+			{Size = UDim2.fromOffset(400-50, 350-50)}
+		):Play()
+		task.wait(.5)
+		self.frame.Visible = false
+	end,
+
+	Update = function(self)
+	end,
+
+	Toggle = function(self)
+		self.Active = not self.Active
+		if self.Active then
+			self:Open()
+		else
+			self:Close()
+		end
+		Toggled:Fire(self.Active)
+	end
+}
