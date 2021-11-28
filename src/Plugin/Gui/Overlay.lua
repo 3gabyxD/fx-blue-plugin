@@ -21,11 +21,14 @@ return {
 
 		self.frame.BackgroundTransparency = Theme.BackgroundTransparency
 		self.frame.BackgroundColor3 = Theme.Background
-		self.frame.BorderSizePixel = 0
+		self.frame.BorderSizePixel = Theme.BorderSize
+		self.frame.BorderColor3 = Theme.BorderColor
 
-		self.uicorner = Instance.new("UICorner")
-		self.uicorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
-		self.uicorner.Parent = self.frame
+		if Theme.CornerRadius > 0 then
+			self.uicorner = Instance.new("UICorner")
+			self.uicorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
+			self.uicorner.Parent = self.frame
+		end
 
 		self.thumbnail = Instance.new("ImageLabel")
 		self.thumbnail.Size = UDim2.fromScale(1, .4)
@@ -69,7 +72,7 @@ return {
 			self:Close()
 		end)
 		self.openbutton = Button(Theme, "Open", "8111953872", function()
-			
+
 		end)
 
 		self.newbutton.Parent = self.files
@@ -87,20 +90,20 @@ return {
 		self.frame.Visible = true
 		TweenService:Create(
 			self.frame,
-			TweenInfo.new(.5),
+			TweenInfo.new(Theme.Transition),
 			{Size = UDim2.fromOffset(400, 350)}
 		):Play()
-		Transparency:fade(self.frame, .5, 1, 0)
+		Transparency:fade(self.frame, Theme.Transition, 1, 0)
 	end,
 
 	Close = function(self)
-		Transparency:fade(self.frame, .5, 0, 1)
+		Transparency:fade(self.frame, Theme.Transition, 0, 1)
 		TweenService:Create(
 			self.frame,
-			TweenInfo.new(.5),
+			TweenInfo.new(Theme.Transition),
 			{Size = UDim2.fromOffset(400-50, 350-50)}
 		):Play()
-		task.wait(.5)
+		task.wait(Theme.Transition)
 		self.frame.Visible = false
 	end,
 
