@@ -45,9 +45,11 @@ return {
 		self.bar = Instance.new("Frame")
 		self.bar.BackgroundColor3 = Theme.Midground
 		self.bar.BackgroundTransparency = Theme.MidgroundTransparency
+		self.bar.BorderSizePixel = Theme.BorderSize
+		self.bar.BorderColor3 = Theme.BorderColor
 		self.bar.Size = UDim2.new(1, 0, 0, Theme.TextSize)
 
-		if Theme.CornerRadius > 0 then	
+		if Theme.CornerRadius > 0 then
 			self.barcorner = Instance.new("UICorner")
 			self.barcorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
 			self.barcorner.Parent = self.frame
