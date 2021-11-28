@@ -139,7 +139,7 @@ return function(frame, minsize, maxsize, flags)
 						startPos.Y.Offset
 					)
 				elseif direction == "rig" then
-					local maxed = math.clamp(startSize.X.Offset + dst.X, minsize.X, maxsize.X)
+					local maxed = math.clamp(startSize.X.Offset - dst.X, minsize.X, maxsize.X)
 					frame.Size = UDim2.new(
 						startSize.X.Scale,
 						maxed,
