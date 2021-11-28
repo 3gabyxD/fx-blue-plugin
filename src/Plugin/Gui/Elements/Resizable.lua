@@ -14,7 +14,7 @@ local function dragger(size, pos, anc)
 	return d
 end
 
-return function(frame, minsize, flags)
+return function(frame, minsize, maxsize, flags)
 	local startSize = frame.Size
 	local startPos = frame.Position
 
@@ -97,7 +97,7 @@ return function(frame, minsize, flags)
 			local dst = holdStart - pos
 			if flags == nil or table.find(flags, direction) then
 				if direction == "top" then
-					local maxed = math.max(minsize.Y, startSize.Y.Offset + dst.Y)
+					local maxed = math.clamp(startSize.Y.Offset + dst.Y, minsize.Y, maxsize.Y)
 					frame.Size = UDim2.new(
 						startSize.X.Scale,
 						startSize.X.Offset,
@@ -111,7 +111,7 @@ return function(frame, minsize, flags)
 						startPos.Y.Offset - ((maxed - startSize.Y.Offset) * frame.AnchorPoint.X)
 					)
 				elseif direction == "bot" then
-					local maxed = math.max(minsize.Y, startSize.Y.Offset - dst.Y)
+					local maxed = math.clamp(startSize.Y.Offset - dst.Y, minsize.Y, maxsize.Y)
 					frame.Size = UDim2.new(
 						startSize.X.Scale,
 						startSize.X.Offset,
@@ -125,7 +125,7 @@ return function(frame, minsize, flags)
 						startPos.Y.Offset + ((maxed - startSize.Y.Offset) * frame.AnchorPoint.X)
 					)
 				elseif direction == "lef" then
-					local maxed = math.max(minsize.X, startSize.X.Offset + dst.X)
+					local maxed = math.clamp(startSize.X.Offset + dst.X, minsize.X, maxsize.X)
 					frame.Size = UDim2.new(
 						startSize.X.Scale,
 						maxed,
@@ -139,7 +139,7 @@ return function(frame, minsize, flags)
 						startPos.Y.Offset
 					)
 				elseif direction == "rig" then
-					local maxed = math.max(minsize.X, startSize.X.Offset - dst.X)
+					local maxed = math.clamp(startSize.X.Offset + dst.X, minsize.X, maxsize.X)
 					frame.Size = UDim2.new(
 						startSize.X.Scale,
 						maxed,
