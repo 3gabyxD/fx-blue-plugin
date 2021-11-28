@@ -25,9 +25,11 @@ local Gui = script.Parent:WaitForChild("Gui")
 local Toggled = Gui.Toggled
 local Overlay = require(Gui.Overlay)
 local Timeline = require(Gui.Timeline)
+local Crosshair = require(Gui.Crosshair)
 
 Timeline:Init(MainScreen)
 Overlay:Init(MainScreen)
+Crosshair:Init(MainScreen)
 
 MainButton.Click:Connect(function()
 	Overlay:Toggle()
