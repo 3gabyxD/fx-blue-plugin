@@ -33,7 +33,7 @@ return {
 		self.frame.AnchorPoint = Vector2.new(.5, .5)
 		self.frame.Visible = false
 
-		if Theme.CornerRadius > 0 then	
+		if Theme.CornerRadius > 0 then
 			self.corner = Instance.new("UICorner")
 			self.corner.CornerRadius = UDim.new(0, Theme.CornerRadius)
 			self.corner.Parent = self.frame
@@ -46,6 +46,12 @@ return {
 		self.bar.BackgroundColor3 = Theme.Midground
 		self.bar.BackgroundTransparency = Theme.MidgroundTransparency
 		self.bar.Size = UDim2.new(1, 0, 0, Theme.TextSize)
+
+		if Theme.CornerRadius > 0 then	
+			self.barcorner = Instance.new("UICorner")
+			self.barcorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
+			self.barcorner.Parent = self.frame
+		end
 
 		self.controls = Instance.new("Frame")
 		self.controls.AnchorPoint = Vector2.new(.5, 0)
