@@ -87,7 +87,6 @@ return function(frame, minsize)
 
 			if direction == "top" then
 				local maxed = math.max(minsize.Y, startSize.Y.Offset + dst.Y)
-
 				frame.Size = UDim2.new(
 					startSize.X.Scale,
 					startSize.X.Offset,
@@ -99,7 +98,7 @@ return function(frame, minsize)
 					startPos.X.Scale,
 					startPos.X.Offset,
 					startPos.Y.Scale,
-					startPos.Y.Offset - (maxed - startSize.Y.Offset)
+					startPos.Y.Offset - ((maxed - startSize.Y.Offset) / 2)
 				)
 			elseif direction == "bot" then
 				local maxed = math.max(minsize.Y, startSize.Y.Offset - dst.Y)
@@ -108,6 +107,12 @@ return function(frame, minsize)
 					startSize.X.Offset,
 					startSize.Y.Scale,
 					maxed
+				)
+				frame.Position = UDim2.new(
+					startPos.X.Scale,
+					startPos.X.Offset,
+					startPos.Y.Scale,
+					startPos.Y.Offset + ((maxed - startSize.Y.Offset) / 2)
 				)
 			elseif direction == "lef" then
 				local maxed = math.max(minsize.X, startSize.X.Offset + dst.X)
@@ -120,7 +125,7 @@ return function(frame, minsize)
 				
 				frame.Position = UDim2.new(
 					startPos.X.Scale,
-					startPos.X.Offset - (maxed - startSize.X.Offset),
+					startPos.X.Offset - ((maxed - startSize.X.Offset) / 2),
 					startPos.Y.Scale,
 					startPos.Y.Offset
 				)
@@ -131,6 +136,12 @@ return function(frame, minsize)
 					maxed,
 					startSize.Y.Scale,
 					startSize.Y.Offset
+				)
+				frame.Position = UDim2.new(
+					startPos.X.Scale,
+					startPos.X.Offset + ((maxed - startSize.X.Offset) / 2),
+					startPos.Y.Scale,
+					startPos.Y.Offset
 				)
 			end
 		end
