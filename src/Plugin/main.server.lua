@@ -18,18 +18,19 @@ ScreenButton.ImageTransparency = 1
 ScreenButton.BackgroundTransparency = 1
 ScreenButton.Size = UDim2.fromScale(1, 1)
 ScreenButton.Visible = false
+ScreenButton.Modal = true
 ScreenButton.ZIndex = -50
-ScreenButton.Parent = MainScreen
+--> ScreenButton.Parent = MainScreen
+
+local mouse = plugin:GetMouse()
 
 local Gui = script.Parent:WaitForChild("Gui")
 local Toggled = Gui.Toggled
 local Overlay = require(Gui.Overlay)
 local Timeline = require(Gui.Timeline)
-local Crosshair = require(Gui.Crosshair)
 
-Timeline:Init(MainScreen)
-Overlay:Init(MainScreen)
-Crosshair:Init(MainScreen)
+Timeline:Init(MainScreen, mouse)
+Overlay:Init(MainScreen, mouse)
 
 MainButton.Click:Connect(function()
 	Overlay:Toggle()

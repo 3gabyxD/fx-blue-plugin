@@ -22,7 +22,7 @@ return function(frame, applyto)
 	end)
 
 	UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		if input.UserInputType == Enum.UserInputType.MouseButton1 and start then
 			local pos = UserInputService:GetMouseLocation()
 			local delta = pos - start
 			applyto.Position = UDim2.new(
