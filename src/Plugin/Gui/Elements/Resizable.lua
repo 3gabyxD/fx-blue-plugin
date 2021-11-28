@@ -28,7 +28,7 @@ return function(frame, minsize, flags)
 		startPos = frame.Position
 	end
 
-	if table.find(flags, "top") then
+	if flags == nil or table.find(flags, "top") then
 		local dragTop = dragger(
 			UDim2.new(1, 0, 0, 10),
 			UDim2.fromScale(.5, 0),
@@ -41,7 +41,7 @@ return function(frame, minsize, flags)
 		end)
 	end
 
-	if table.find(flags, "bot") then
+	if flags == nil or table.find(flags, "bot") then
 		local dragBot = dragger(
 			UDim2.new(1, 0, 0, 10),
 			UDim2.fromScale(.5, 1),
@@ -54,7 +54,7 @@ return function(frame, minsize, flags)
 		end)
 	end
 
-	if table.find(flags, "lef") then
+	if flags == nil or table.find(flags, "lef") then
 		local dragLeft = dragger(
 			UDim2.new(0, 10, 1, 0),
 			UDim2.fromScale(0, .5),
@@ -67,7 +67,7 @@ return function(frame, minsize, flags)
 		end)
 	end
 
-	if table.find(flags, "rig") then
+	if flags == nil or table.find(flags, "rig") then
 		local dragRight = dragger(
 			UDim2.new(0, 10, 1, 0),
 			UDim2.fromScale(1, .5),
