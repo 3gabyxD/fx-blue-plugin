@@ -67,11 +67,11 @@ return {
 		self.filestitle.TextXAlignment = Enum.TextXAlignment.Left
 		self.filestitle.Parent = self.files
 
-		self.newbutton = Button(Theme, "New", "8111953872", function()
+		self.newbutton = Button("New", "8111953872", function()
 			TimelineUI:Open()
 			self:Close()
 		end)
-		self.openbutton = Button(Theme, "Open", "8111953872", function()
+		self.openbutton = Button("Open", "8111953872", function()
 
 		end)
 
@@ -86,6 +86,7 @@ return {
 	end,
 
 	Open = function(self)
+		self.Active = true
 		self.frame.Size = UDim2.fromOffset(400-50, 350-50)
 		self.frame.Visible = true
 		TweenService:Create(
@@ -97,6 +98,7 @@ return {
 	end,
 
 	Close = function(self)
+		self.Active = false
 		Transparency:fade(self.frame, Theme.Transition, 0, 1)
 		TweenService:Create(
 			self.frame,
