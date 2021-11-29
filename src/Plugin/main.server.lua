@@ -1,7 +1,16 @@
+local ServerStorage = game:GetService("ServerStorage")
+
 local Toolbar = plugin:CreateToolbar("FX-Blue")
 local MainButton = Toolbar:CreateButton("Main", "Open FX-Blue", "")
 
-local SocialService = game:GetService("SocialService")
+local FilesName = "FX-Blue-Files"
+local EffectsFolder = ServerStorage:FindFirstChild(FilesName)
+if EffectsFolder == nil then
+	EffectsFolder =  Instance.new("Folder")
+	EffectsFolder.Name = FilesName
+	EffectsFolder.Parent = ServerStorage
+end
+
 local CoreGui = game:GetService("CoreGui")
 
 if CoreGui:FindFirstChild("FX-Blue-Main") then
@@ -31,6 +40,13 @@ local Timeline = require(Gui.Timeline)
 
 Timeline:Init(MainScreen, mouse)
 Overlay:Init(MainScreen, mouse)
+
+for _, logic in pairs(script.Parent.Logic:GetChildren()) do
+	local log = require(logic)
+	if log.Init then
+		log:Init()
+	end
+end
 
 MainButton.Click:Connect(function()
 	Overlay:Toggle()

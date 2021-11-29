@@ -9,6 +9,8 @@ local Draggable = require(Elements.Draggable)
 local Button = require(Elements.Button)
 local Transparency = require(Elements.Transparency)
 
+local Cache = require(script.Parent.Parent.Logic.Cache)
+
 local function controlbutton(image, callback)
 	local b = Instance.new("ImageButton")
 	b.Image = "rbxassetid://" .. image
@@ -22,6 +24,36 @@ end
 
 return {
 	Active = false,
+	renderelement = function(self, element)
+		local i = #self.elementframes+1
+		self.elementframes[i] = Instance.new("Frame")
+		self.elementframes[i].BackgroundTransparency = 1
+		self.elementframes[i].Size = UDim2.new(1, 0, 0, Theme.TextSize)
+
+		local text = Instance.new("TextButton")
+		text.Text = element.Name
+		text.TextSize = Theme.TextSize
+		text.Font = Enum.Font[Theme.Font]
+		text.TextColor3 = Theme.Foreground
+		text.Size = UDim2.new(1, 0, 0, Theme.TextSize)
+		text.BackgroundTransparency = 1
+		text.TextXAlignment = Enum.TextXAlignment.Left
+
+		text.MouseEnter:Connect(function()
+			text.TextColor3 = Theme.ForegroundHover
+		end)
+
+		text.MouseLeave:Connect(function()
+			text.TextColor3 = Theme.Foreground
+		end)
+
+		text.Parent = self.elementframes[i]
+
+		self.elementframes[i].Parent = self.elements
+
+
+	end,
+
 	Init = function(self, screen, mouse)
 		self.frame = Instance.new("Frame")
 		self.frame.Position = UDim2.fromScale(.5, .5)
@@ -98,23 +130,26 @@ return {
 		self.bar.Parent = self.frame
 
 		---> Board <---
-		self.board = Instance.new("Frame")
+		self.board = Instance.new("ScrollingFrame")
 		self.board.Size = UDim2.new(1, 0, 1, -Theme.TextSize)
 		self.board.BackgroundTransparency = 1
+		self.board.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		self.board.CanvasSize = self.board.Size
+		self.board.ScrollBarThickness = 0
 		self.board.AnchorPoint = Vector2.new(.5, 1)
 		self.board.Position = UDim2.fromScale(.5, 1)
 
 		---> Elements <---
-		self.elements = Instance.new("Frame")
-		self.elements.Size = UDim2.new(0, 100, 1, 0)
-		self.elements.Position = UDim2.fromScale(0, 1)
-		self.elements.AnchorPoint = Vector2.new(0, 1)
-		self.elements.BackgroundColor3 = Theme.Background
-		self.elements.BackgroundTransparency = Theme.BackgroundTransparency
-		self.elements.BorderColor3 = Theme.BorderColor
-		self.elements.BorderSizePixel = Theme.BorderSize
+		self.elementsframe = Instance.new("Frame")
+		self.elementsframe.Size = UDim2.new(0, 100, 1, 0)
+		self.elementsframe.Position = UDim2.fromScale(0, 1)
+		self.elementsframe.AnchorPoint = Vector2.new(0, 1)
+		self.elementsframe.BackgroundColor3 = Theme.Background
+		self.elementsframe.BackgroundTransparency = Theme.BackgroundTransparency
+		self.elementsframe.BorderColor3 = Theme.BorderColor
+		self.elementsframe.BorderSizePixel = Theme.BorderSize
 		Resizable(
-			self.elements,
+			self.elementsframe,
 			Vector2.new(100),
 			Vector2.new(200),
 			{"rig"}
@@ -123,10 +158,25 @@ return {
 		self.elementscorner = Instance.new("UICorner")
 		if Theme.CornerRadius > 0 then
 			self.elementscorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
-			self.elementscorner.Parent = self.elements
+			self.elementscorner.Parent = self.elementsframe
 		end
 
-		self.elements.Parent = self.board
+		self.elements = Instance.new("Frame")
+		self.elements.Size = UDim2.fromScale(1, 1)
+		self.elements.BackgroundTransparency = 1
+		self.elements.BorderSizePixel = 1
+		self.elements.Parent = self.elementsframe
+
+		self.elementslist = Instance.new("UIListLayout")
+		self.elementslist.SortOrder = Enum.SortOrder.LayoutOrder
+		self.elementslist.Parent = self.elements
+
+		self.elementframes = {}
+		for i, v in pairs(Cache.File.elements) do
+			self:renderelement(v)
+		end
+
+		self.elementsframe.Parent = self.board
 
 		self.board.Parent = self.frame
 		self.frame.Parent = screen
@@ -142,11 +192,11 @@ return {
 	Open = function(self)
 		self.Active = true
 		self.frame.Visible = true
-		self.frame.Size = UDim2.fromOffset(400-50, 250-50)
+		self.frame.Size = self.frame.Size - UDim2.fromOffset(50, 50)
 		TweenService:Create(
 			self.frame,
 			TweenInfo.new(Theme.Transition),
-			{Size = UDim2.fromOffset(400, 250)}
+			{Size = self.frame.Size + UDim2.fromOffset(50, 50)}
 		):Play()
 		Transparency:fade(self.frame, Theme.Transition, 1, 0)
 		Toggled:Fire(self.Active)

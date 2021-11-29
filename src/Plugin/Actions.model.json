@@ -1,0 +1,37 @@
+{
+	"ClassName": "Folder",
+	"Children": [
+		{
+			"Name": "NewFile",
+			"ClassName": "BindableEvent"
+		},
+		{
+			"Name": "OpenFile",
+			"ClassName": "BindableEvent"
+		},
+		{
+			"Name": "SaveFile",
+			"ClassName": "BindableEvent"
+		},
+		{
+			"Name": "RegisterElement",
+			"ClassName": "BindableEvent"
+		},
+		{
+			"Name": "GetElements",
+			"ClassName": "BindableFunction"
+		},
+		{
+			"Name": "RenderFrame",
+			"ClassName": "BindableEvent"
+		},
+		{
+			"Name": "PlayFrom",
+			"ClassName": "BindableEvent"
+		},
+		{
+			"Name": "StopPlayback",
+			"ClassName": "BindableEvent"
+		}
+	]
+}

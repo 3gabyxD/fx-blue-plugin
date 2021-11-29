@@ -8,6 +8,8 @@ local Elements = script.Parent.Elements
 local Button = require(Elements.Button)
 local Transparency = require(Elements.Transparency)
 
+local Actions = script.Parent.Parent.Actions
+
 return {
 	Active = false,
 
@@ -72,7 +74,7 @@ return {
 			self:Close()
 		end)
 		self.openbutton = Button("Open", "8111953872", function()
-
+			Actions.SaveFile:Fire()
 		end)
 
 		self.newbutton.Parent = self.files

@@ -4,6 +4,7 @@
     "$className": "DataModel",
 
     "ServerScriptService": {
+      "$className": "ServerScriptService",
       "FX-Blue": {
         "$path": "src/Plugin"
       }
