@@ -2,8 +2,28 @@ return {
 	File = {
 		packages = {"bezier-path", "random"},
 		name = "Cool Effect",
-		elements = {workspace.Baseplate}, --> assets
+		elements = {workspace.Baseplate, workspace.Part}, --> assets
 		frames = {
+			["Part"] = {
+				{
+					time = 0.3,
+					easing = {{0, 0}, {1, 1}},
+					offset = CFrame.new(),
+					Size = Vector3.new()
+				},
+				{
+					time = 0.6,
+					easing = {{0, 0}, {1, 1}},
+					offset = CFrame.new(),
+					Size = Vector3.new(2, 2, 2)
+				},
+				{
+					time = 1.45,
+					easing = {{0, 0}, {1, 1}},
+					offset = CFrame.new(0, 5, 0),
+					Size = Vector3.new(5, 5, 5)
+				}
+			},
 			["Baseplate"] = {
 				{
 					time = 0,

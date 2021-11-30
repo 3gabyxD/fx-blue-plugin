@@ -59,7 +59,7 @@ return {
 			local Properties = {}
 			for _, Frame in pairs(Frames) do
 				for Property, _ in pairs(Frame) do
-					if Property ~= "Time" and Property ~= "easing" and not table.find(Properties, Property) then
+					if Property ~= "time" and Property ~= "easing" and not table.find(Properties, Property) then
 						Properties[#Properties+1] = Property
 					end
 				end
@@ -73,7 +73,7 @@ return {
 			})
 
 			local Title = Instantiate("Frame", {
-				Size = UDim2.new(0, self.SidebarWidth, 1, 0),
+				Size = UDim2.new(0, self.SidebarWidth, 0, Theme.TextSize),
 
 				BackgroundColor3 = Theme.Background,
 				BackgroundTransparency = Theme.BackgroundTransparency,
@@ -85,7 +85,7 @@ return {
 
 			local TitleText = Instantiate("TextButton", {
 				Parent = Title,
-				Size = UDim2.new(1, -Theme.TextSize - 10, 1, 0),
+				Size = UDim2.new(1, -Theme.TextSize - 10, 0, Theme.TextSize),
 				Position = UDim2.fromOffset(Theme.TextSize),
 
 				BackgroundTransparency = 1,
@@ -98,7 +98,7 @@ return {
 
 			local Keys = Instantiate("Frame", {
 				Position = UDim2.fromOffset(self.SidebarWidth, 0),
-				Size = UDim2.new(1, -self.SidebarWidth, 1, 0),
+				Size = UDim2.new(1, -self.SidebarWidth, 0, Theme.TextSize),
 
 				BackgroundColor3 = Theme.Background,
 				BackgroundTransparency = Theme.BackgroundTransparency,
@@ -107,17 +107,38 @@ return {
 
 				Parent = self.Elements[Name]
 			})
-			for _, Property in pairs(Properties) do
-				Instantiate("Frame", {
+			for i, Property in pairs(Properties) do
+				local PropertyTitle = Instantiate("TextLabel", {
 					Parent = self.Elements[Name],
 
-					Size = UDim2.new(1, 0, 0, Theme.TextSize),
-					BackgroundColor3 = Theme.BackgroundAlt,
+					Name = Property,
+					Size = UDim2.new(0, self.SidebarWidth, 0, Theme.TextSize),
+					Position = UDim2.fromOffset(0, i * Theme.TextSize),
+
+					BackgroundColor3 = Theme.BackgroundAlt2,
+					BackgroundTransparency = Theme.BackgroundTransparency,
+					BorderSizePixel = Theme.BorderSize,
+					TextColor3 = Theme.Foreground,
+					Text = Property == "offset" and "CFrame" or Property,
+					Font = Enum.Font[Theme.Font],
+					TextSize = Theme.TextSize,
+					TextXAlignment = Enum.TextXAlignment.Right,
+					BorderColor3 = Theme.BorderColor,
+				})
+
+				local PropertyKeys = Instantiate("Frame", {
+					Parent = self.Elements[Name],
+
+					Name = Property,
+					Size = UDim2.new(1, -self.SidebarWidth, 0, Theme.TextSize),
+					Position = UDim2.fromOffset(self.SidebarWidth, i * Theme.TextSize),
+					BackgroundColor3 = Theme.BackgroundAlt2,
 					BackgroundTransparency = Theme.BackgroundTransparency,
 					BorderSizePixel = Theme.BorderSize,
 					BorderColor3 = Theme.BorderColor,
-
 				})
+
+
 			end
 
 

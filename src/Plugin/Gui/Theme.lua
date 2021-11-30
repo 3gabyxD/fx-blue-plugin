@@ -1,5 +1,5 @@
 return {
-	Font = "Roboto",
+	Font = "Sarpanch",
 	TextSize = 20,
 	OverlayThumbnailScale = "Crop",
 	OverlayThumbnail = "7539878325",
