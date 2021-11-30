@@ -1,217 +1,258 @@
+--|| Services ||--
 local TweenService = game:GetService("TweenService")
 
-local Toggled = script.Parent.Toggled
-local Theme = require(script.Parent.Theme)
+--|| References ||--
+local Host = script.Parent.Parent
+local Theme = require(Host.Gui.Theme)
+local Cache = require(Host.Logic.Cache)
 
-local Elements = script.Parent.Elements
-local Resizable = require(Elements.Resizable)
-local Draggable = require(Elements.Draggable)
-local Button = require(Elements.Button)
+--|| Elements ||--
+local Elements = Host.Gui.Elements
 local Transparency = require(Elements.Transparency)
+local Draggable = require(Elements.Draggable)
 
-local Cache = require(script.Parent.Parent.Logic.Cache)
+--|| Utility ||--
+local Util = Host.Util
+local Instantiate = require(Util.Instantiate)
 
-local function controlbutton(image, callback)
-	local b = Instance.new("ImageButton")
-	b.Image = "rbxassetid://" .. image
-	b.ImageColor3 = Theme.Foreground
-	b.ImageTransparency = Theme.ForegroundTransparency
-	b.SizeConstraint = Enum.SizeConstraint.RelativeYY
-	b.Size = UDim2.fromScale(1,1)
-	b.BackgroundTransparency = 1
-	return b
-end
+--|| Timeline ||--
+local FPS = 24
 
 return {
-	Active = false,
-	renderelement = function(self, element)
-		local i = #self.elementframes+1
-		self.elementframes[i] = Instance.new("Frame")
-		self.elementframes[i].BackgroundTransparency = 1
-		self.elementframes[i].Size = UDim2.new(1, 0, 0, Theme.TextSize)
+	DefaultSize = UDim2.fromOffset(
+		600, Theme.TextSize * 8
+	),
 
-		local text = Instance.new("TextButton")
-		text.Text = element.Name
-		text.TextSize = Theme.TextSize
-		text.Font = Enum.Font[Theme.Font]
-		text.TextColor3 = Theme.Foreground
-		text.Size = UDim2.new(1, 0, 0, Theme.TextSize)
-		text.BackgroundTransparency = 1
-		text.TextXAlignment = Enum.TextXAlignment.Left
+	ToolbarSize = UDim2.new(
+		1, 0, 0, Theme.TextSize
+	),
 
-		text.MouseEnter:Connect(function()
-			text.TextColor3 = Theme.ForegroundHover
-		end)
+	BoardPadding = 20,
+	SidebarWidth = 120,
+	SecondsOffset = 60,
+	SequenceHeight = 18,
 
-		text.MouseLeave:Connect(function()
-			text.TextColor3 = Theme.Foreground
-		end)
-
-		text.Parent = self.elementframes[i]
-
-		self.elementframes[i].Parent = self.elements
-
-
+	RenderTimelineLines = function(self)
+		local lastKey = 0
+		for _, frameset in pairs(Cache.File.frames) do
+			for _, frame in pairs(frameset) do
+				if frame.time >= lastKey then
+					lastKey = frame.time
+				end
+			end
+		end
+		for i = 0, lastKey, 1 do
+			local f = Instantiate("Frame", {
+				Size = UDim2.fromOffset(Theme.BorderSize, Theme.TextSize*0.75),
+				Position = UDim2.new(0, self.BoardPadding + i * self.SecondsOffset, .5, 0),
+				AnchorPoint = Vector2.new(.5, .5),
+				BackgroundColor3 = Theme.Foreground,
+				BorderSizePixel = 0,
+				Parent = self.Timeline
+			})
+		end
 	end,
 
-	Init = function(self, screen, mouse)
-		self.frame = Instance.new("Frame")
-		self.frame.Position = UDim2.fromScale(.5, .5)
-		self.frame.Size = UDim2.fromOffset(400, 250)
-		self.frame.BackgroundColor3 = Theme.Background
-		self.frame.BackgroundTransparency = Theme.BackgroundTransparency
-		self.frame.BorderColor3 = Theme.BorderColor
-		self.frame.BorderSizePixel = Theme.BorderSize
-		self.frame.AnchorPoint = Vector2.new(.5, .5)
-		self.frame.Visible = false
+	PopulateElements = function(self)
+		local File = Cache.File
+		for Name, Frames in pairs(File.frames) do
+			local Properties = {}
+			for _, Frame in pairs(Frames) do
+				for Property, _ in pairs(Frame) do
+					if Property ~= "Time" and Property ~= "easing" and not table.find(Properties, Property) then
+						Properties[#Properties+1] = Property
+					end
+				end
+			end
+			local NProperties = #Properties
 
-		if Theme.CornerRadius > 0 then
-			self.corner = Instance.new("UICorner")
-			self.corner.CornerRadius = UDim.new(0, Theme.CornerRadius)
-			self.corner.Parent = self.frame
+			self.Elements[Name] = Instantiate("Frame", {
+				Size = UDim2.new(1, 0, 0, Theme.TextSize + Theme.TextSize*NProperties),
+				BackgroundTransparency = 1,
+				Parent = self.Board
+			})
+
+			local Title = Instantiate("Frame", {
+				Size = UDim2.new(0, self.SidebarWidth, 1, 0),
+
+				BackgroundColor3 = Theme.Background,
+				BackgroundTransparency = Theme.BackgroundTransparency,
+				BorderSizePixel = Theme.BorderSize,
+				BorderColor3 = Theme.BorderColor,
+
+				Parent = self.Elements[Name]
+			})
+
+			local TitleText = Instantiate("TextButton", {
+				Parent = Title,
+				Size = UDim2.new(1, -Theme.TextSize - 10, 1, 0),
+				Position = UDim2.fromOffset(Theme.TextSize),
+
+				BackgroundTransparency = 1,
+				TextColor3 = Theme.Foreground,
+				Font = Enum.Font[Theme.Font],
+				TextSize = Theme.TextSize,
+				Text = Name,
+				TextXAlignment = Enum.TextXAlignment.Right,
+			})
+
+			local Keys = Instantiate("Frame", {
+				Position = UDim2.fromOffset(self.SidebarWidth, 0),
+				Size = UDim2.new(1, -self.SidebarWidth, 1, 0),
+
+				BackgroundColor3 = Theme.Background,
+				BackgroundTransparency = Theme.BackgroundTransparency,
+				BorderSizePixel = Theme.BorderSize,
+				BorderColor3 = Theme.BorderColor,
+
+				Parent = self.Elements[Name]
+			})
+			for _, Property in pairs(Properties) do
+				Instantiate("Frame", {
+					Parent = self.Elements[Name],
+
+					Size = UDim2.new(1, 0, 0, Theme.TextSize),
+					BackgroundColor3 = Theme.BackgroundAlt,
+					BackgroundTransparency = Theme.BackgroundTransparency,
+					BorderSizePixel = Theme.BorderSize,
+					BorderColor3 = Theme.BorderColor,
+
+				})
+			end
+
+
+			for i, frame in pairs(Frames) do
+				Instantiate("Frame", {
+					Parent = Keys,
+					Position = UDim2.new(0, self.BoardPadding + frame.time*self.SecondsOffset, 0.5, 0),
+					Size = UDim2.fromOffset(Theme.TextSize/2, Theme.TextSize/2),
+					AnchorPoint = Vector2.new(.5, .5),
+
+					BorderSizePixel = 0,
+					BackgroundColor3 = Theme.Foreground,
+					BackgroundTransparency = Theme.ForegroundTransparency,
+					ZIndex = 2,
+					Rotation = 45,
+				})
+				
+				if i > 1 then
+					local last = Frames[i - 1]
+					if last then
+						local this = self.BoardPadding + frame.time*self.SecondsOffset
+						local _last = self.BoardPadding + last.time*self.SecondsOffset
+						local center = (_last + this) / 2
+						Instantiate("Frame", {
+							Parent = Keys,
+							Position = UDim2.new(0, center, 0.5, 0),
+							Size = UDim2.fromOffset(this - _last, self.SequenceHeight),
+							AnchorPoint = Vector2.new(.5, .5),
+							
+							BorderSizePixel = 0,
+							BackgroundColor3 = Theme.Midground,
+							BackgroundTransparency = Theme.MidgroundTransparency,
+							ZIndex = 1,
+						})
+					end
+				end
+			end
 		end
-
-		Resizable(self.frame, Vector2.new(300, 200), Vector2.new(600, 400))
-		Draggable(self.frame)
-		-->> Tool Bar <<---
-		--> controls
-		--> controlslist
-		--> buttons (table)
-		self.bar = Instance.new("Frame")
-		self.bar.BackgroundColor3 = Theme.Midground
-		self.bar.BackgroundTransparency = Theme.MidgroundTransparency
-		self.bar.BorderSizePixel = Theme.BorderSize
-		self.bar.BorderColor3 = Theme.BorderColor
-		self.bar.Size = UDim2.new(1, 0, 0, Theme.TextSize)
-
-		if Theme.CornerRadius > 0 then
-			self.barcorner = Instance.new("UICorner")
-			self.barcorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
-			self.barcorner.Parent = self.bar
-		end
-
-		self.controls = Instance.new("Frame")
-		self.controls.AnchorPoint = Vector2.new(.5, 0)
-		self.controls.Position = UDim2.fromScale(.5, 0)
-		self.controls.Size = UDim2.new(0, Theme.TextSize * 5, 1, 0)
-
-		self.controlslist = Instance.new("UIListLayout")
-		self.controlslist.FillDirection = Enum.FillDirection.Horizontal
-		self.controlslist.SortOrder = Enum.SortOrder.LayoutOrder
-		self.controlslist.Parent = self.controls
-
-		self.buttons = {}
-		self.buttons.jumptostart = controlbutton("")
-		self.buttons.jumptostart.Parent = self.controls
-
-		self.buttons.lastkeyframe = controlbutton("")
-		self.buttons.lastkeyframe.Parent = self.controls
-
-		self.buttons.playback = controlbutton("")
-		self.buttons.playback.Parent = self.controls
-
-		self.buttons.nextkeyframe = controlbutton("")
-		self.buttons.nextkeyframe.Parent = self.controls
-
-		self.buttons.jumptoend = controlbutton("")
-		self.buttons.jumptoend.Parent = self.controls
-
-		self.controls.Parent = self.bar
-
-		self.closebutton = Button("X", nil, function()
-			self:Close()
-		end)
-		self.closebutton.SizeConstraint = Enum.SizeConstraint.RelativeYY
-		self.closebutton.Size = UDim2.fromScale(1, 1)
-		self.closebutton.Position = UDim2.fromScale(1, 0)
-		self.closebutton.AnchorPoint = Vector2.new(1, 0)
-		self.closebutton.Parent = self.bar
-
-		self.bar.Parent = self.frame
-
-		---> Board <---
-		self.board = Instance.new("ScrollingFrame")
-		self.board.Size = UDim2.new(1, 0, 1, -Theme.TextSize)
-		self.board.BackgroundTransparency = 1
-		self.board.AutomaticCanvasSize = Enum.AutomaticSize.Y
-		self.board.CanvasSize = self.board.Size
-		self.board.ScrollBarThickness = 0
-		self.board.AnchorPoint = Vector2.new(.5, 1)
-		self.board.Position = UDim2.fromScale(.5, 1)
-
-		---> Elements <---
-		self.elementsframe = Instance.new("Frame")
-		self.elementsframe.Size = UDim2.new(0, 100, 1, 0)
-		self.elementsframe.Position = UDim2.fromScale(0, 1)
-		self.elementsframe.AnchorPoint = Vector2.new(0, 1)
-		self.elementsframe.BackgroundColor3 = Theme.Background
-		self.elementsframe.BackgroundTransparency = Theme.BackgroundTransparency
-		self.elementsframe.BorderColor3 = Theme.BorderColor
-		self.elementsframe.BorderSizePixel = Theme.BorderSize
-		Resizable(
-			self.elementsframe,
-			Vector2.new(100),
-			Vector2.new(200),
-			{"rig"}
-		)
-
-		self.elementscorner = Instance.new("UICorner")
-		if Theme.CornerRadius > 0 then
-			self.elementscorner.CornerRadius = UDim.new(0, Theme.CornerRadius)
-			self.elementscorner.Parent = self.elementsframe
-		end
-
-		self.elements = Instance.new("Frame")
-		self.elements.Size = UDim2.fromScale(1, 1)
-		self.elements.BackgroundTransparency = 1
-		self.elements.BorderSizePixel = 1
-		self.elements.Parent = self.elementsframe
-
-		self.elementslist = Instance.new("UIListLayout")
-		self.elementslist.SortOrder = Enum.SortOrder.LayoutOrder
-		self.elementslist.Parent = self.elements
-
-		self.elementframes = {}
-		for i, v in pairs(Cache.File.elements) do
-			self:renderelement(v)
-		end
-
-		self.elementsframe.Parent = self.board
-
-		self.board.Parent = self.frame
-		self.frame.Parent = screen
-
-		Transparency:cacheall(self.frame)
-
-		self:Update()
 	end,
 
-	Update = function(self)
+	Init = function(self, screen)
+		self.Window = Instantiate("Frame", {
+			Size = self.DefaultSize,
+			BorderSizePixel = Theme.BorderSize,
+			BorderColor3 = Theme.BorderColor,
+			BackgroundColor3 = Theme.Background,
+			BackgroundTransparency = Theme.BackgroundTransparency,
+			Visible = false
+		})
+
+		self.WindowCorner = Instantiate("UICorner", {
+			CornerRadius = UDim.new(0, Theme.CornerRadius),
+			Parent = self.Window
+		})
+
+		self.Menu = Instantiate("Frame", {
+			Size = self.ToolbarSize,
+			BorderSizePixel = Theme.BorderSize,
+			BorderColor3 = Theme.BorderColor,
+			BackgroundColor3 = Theme.Background,
+			BackgroundTransparency = Theme.BackgroundTransparency,
+			Parent = self.Window
+		})
+
+		self.Toolbar = Instantiate("Frame", {
+			Position = UDim2.fromOffset(0, Theme.TextSize),
+			Size = self.ToolbarSize,
+			BorderSizePixel = Theme.BorderSize,
+			BackgroundTransparency = 1,
+			Parent = self.Window
+		})
+
+		self.Tools = Instantiate("Frame", {
+			Size = UDim2.fromOffset(self.SidebarWidth, Theme.TextSize),
+			BackgroundColor3 = Theme.BackgroundAlt2,
+			BackgroundTransparency = Theme.BackgroundTransparency,
+			BorderSizePixel = Theme.BorderSize,
+			BorderColor3 = Theme.BorderColor,
+			Parent = self.Toolbar
+		})
+
+		self.Timeline = Instantiate("ScrollingFrame", {
+			Size = UDim2.new(1, -self.SidebarWidth, 0, Theme.TextSize),
+			Position = UDim2.fromOffset(self.SidebarWidth, 0),
+			BackgroundColor3 = Theme.BackgroundAlt,
+			BackgroundTransparency = Theme.BackgroundTransparency,
+			BorderSizePixel = Theme.BorderSize,
+			BorderColor3 = Theme.BorderColor,
+			ScrollBarThickness = 0,
+			ScrollingEnabled = false,
+			CanvasSize = UDim2.fromScale(2, 1),
+			AutomaticCanvasSize = Enum.AutomaticSize.X,
+			Parent = self.Toolbar
+		})
+
+		Instantiate("Frame", {
+			AnchorPoint = Vector2.new(.5, .5),
+			Position = UDim2.fromScale(.5, .5),
+			Size = UDim2.new(1, -20, 0, Theme.BorderSize),
+			BackgroundColor3 = Theme.Foreground,
+			BorderSizePixel = 0,
+			Parent = self.Timeline
+		})
+		self:RenderTimelineLines()
+
+		self.Board = Instantiate("ScrollingFrame", {
+			Position = UDim2.fromOffset(0, Theme.TextSize * 2),
+			Size = UDim2.new(1, 0, 1, -Theme.TextSize * 2),
+			BackgroundTransparency = 1,
+			CanvasSize = UDim2.fromScale(1, 1),
+			AutomaticCanvasSize = Enum.AutomaticSize.None,
+			ScrollBarThickness = 0,
+			ZIndex = -1,
+			Parent = self.Window
+		})
+		Instantiate("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Parent = self.Board
+		})
+
+		self.Elements = {}
+		self:PopulateElements()
+
+
+		Transparency:cacheall(self.Window)
+		Draggable(self.Window)
+		self.Window.Parent = screen
 	end,
 
 	Open = function(self)
-		self.Active = true
-		self.frame.Visible = true
-		self.frame.Size = self.frame.Size - UDim2.fromOffset(50, 50)
-		TweenService:Create(
-			self.frame,
-			TweenInfo.new(Theme.Transition),
-			{Size = self.frame.Size + UDim2.fromOffset(50, 50)}
-		):Play()
-		Transparency:fade(self.frame, Theme.Transition, 1, 0)
-		Toggled:Fire(self.Active)
+		self.Window.Visible = true
 	end,
-
+	
 	Close = function(self)
-		Transparency:fade(self.frame, Theme.Transition, 0, 1)
-		TweenService:Create(
-			self.frame,
-			TweenInfo.new(Theme.Transition),
-			{Size = self.frame.Size - UDim2.fromOffset(50, 50)}
-		):Play()
-		task.wait(Theme.Transition)
-		self.Active = false
-		self.frame.Visible = false
-		Toggled:Fire(self.Active)
+		self.Window.Visible = false
 	end,
 }
